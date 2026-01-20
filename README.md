@@ -1,79 +1,75 @@
 
-# OpenProject
+# iperf3
 
 - [OpenProject Documentation][0]
 - [Docker Compose bootstrap configuration][10]
+- [Docker Hub: networkstatic/iperf3][20]
 
 ## usage
 
-*...*
+Once the server is setup and ready, you can begin running speed tests on the
+client-side with something like:
+
+``shell
+# -c implies client
+# -P implies the number of parallel threads
+# -t implies the duration of the test
+iperf3 -c example.com -P2 -t60
+```
+
+For additional options, consult the command line usage reference, or check out
+the manual page for `iperf3`.
+
+```shell
+iperf3 --help
+```
 
 ### deps
 
-*...*
+- `docker`
+- `docker-compose`
 
 ### docker setup
 
-First, we must prepare our local environment to suit this
-project by maintaining a local environment file called `.env`. This file must
-never be checked into revision control! If you accidently push the file onto
-a public medium, **all bits** considered sensitive must be discarded in full
-and regenerated from scratch (by following this guide again).
+This project needs no particular environment to be setup, other than a quick
+check of the `ports` assignment in regards to your firewall layout and maybe
+an adjustment to the `command` if the defaults do not suit you. This container
+should be ran with no privileges unless you so happen to use one of the
+following switches:
 
-So, without further ado, let us begin by creating our local environment file!
-
-```sh
-cp -av .env.dist .env
-```
-
-Next, use your favorite text editor and begin filling in the
-variables inside of each file to your liking. However you choose
-to manage your credentials for this sort of thing, be sure that the
-passwords are kept somewhere safe and accessible in the case that they may
-need to be revoked at some point in the future.
-
-```sh
-PROJECT_SITE_URL=project.fs1.home
-```
-
-As I already have a private DNS setup on my LAN, I simply
-visit my authoritative DNS panel and add an entry to the
-**fs1.home** zone. Feel free to start off by using
-**localhost** for this, orby adding an entry to your hosts
-file at `/etc/hosts`.
-
-```sh
-# /etc/hosts
-# Note that if you are using a reverse proxy that is hosted
-# elsewhere, you may want to update the IP to reflect the
-# address of the proxy host.
-<hostIP> project.localhost
-```
+- `-B` root privs required
+- `-s` root privs required
+- `-D` root privs required
+- `--get-server-output` (maybe)
 
 Finally, we can bootstrap the project! Cross your fingers, say
 your prayers or however your typical ritual for this goes:
 
-```sh
+```shell
 docker compose up -d
 docker compose down
 docker compose up -d --force-recreate
 docker compose up -d service-server --force-recreate
 ```
 
-```sh
+```shell
 # Check status of each service
 docker compose logs #--since=5m -f
 
-```sh
+```shell
 # Start and stop an individual service
 docker start service-db # service name
 docker stop service-proxy # service name
 ```
 
-- bind mounts
-  * `./mounts/...`
+```shell
+docker exec -it iperf3-1 /bin/bash
+docker exec -it iperf3-1 /usr/bin/iperf3 --help
+```
 
 ## reference documents
 
 [0]: https://www.openproject.org/docs/getting-started/
 [10]: https://github.com/opf/openproject-docker-compose.git
+[20]: https://hub.docker.com/r/networkstatic/iperf3
+
